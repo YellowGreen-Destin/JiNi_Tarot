@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지니 한글 타로</title>
+  <style>
+    /* html과 body의 높이를 100%로 설정하고 overflow-y를 auto로 설정하여 스크롤을 활성화 */
+   html, body {
+  height: 100%;  /* 페이지가 화면을 꽉 채우도록 설정 */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;  /* 수평 스크롤을 숨기기 */
+}
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  overflow-y: auto;  /* 수직 스크롤 활성화 */
+  box-sizing: border-box;
+}
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.question-input {
+  margin: 20px 0;
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.button-container {
+  margin-bottom: 20px;
+}
+
+.card-container,
+.card-container-4,
+.card-container-6,
+.card-container-8,
+.card-container-9 {
+  display: grid;
+  gap: 5px;  /* 카드 간격 */
+  justify-items: center;
+}
+
+.card-container {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card-container-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card-container-6 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card-container-8 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card-container-9 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 250px;  /* 카드 크기 조정 */
+  height: auto;
+  margin: 0 auto;
+  border-radius: 8px;
+  border: 0.5px solid black;  /* 카드 테두리 */
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.memo {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  display: none;
+}
+
+.memo-visible {
+  display: block;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+footer {
+  margin-top: 20px;
+}
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>지니 한글 타로</h1>
+
+    <!-- 질문 입력창 -->
+    <input type="text" id="question" class="question-input" placeholder="질문을 입력하세요." />
+
+    <!-- 버튼들 -->
+    <div class="button-container">
+      <button id="draw-3-cards">3카드</button>
+      <button id="draw-4-cards">4카드</button>
+      <button id="draw-6-cards">6카드</button>
+      <button id="draw-8-cards">8카드</button>
+      <button id="draw-9-cards">9카드</button>
+    </div>
+
+    <!-- 카드가 표시될 곳 -->
+    <div id="card-container" class="card-container"></div>
+
+    <footer>
+      <p>✨ 제작: 연유🌱</p>
+    </footer>
+  </div>
+
+  <script>
+    const cards = [];
+    for (let i = 0; i < 78; i++) {
+      cards.push(`cards/${i.toString().padStart(2, '0')}.jpeg`);
+    }
+
+    let usedCards = [];
+
+    function drawCard() {
+      let randomIndex;
+      let card;
+
+      do {
+        randomIndex = Math.floor(Math.random() * cards.length);
+        card = cards[randomIndex];
+      } while (usedCards.includes(card));
+
+      usedCards.push(card);
+      return card;
+    }
+
+    function drawCards(count) {
+      const cardContainer = document.getElementById('card-container');
+      cardContainer.innerHTML = ''; // 기존 카드 초기화
+
+      let containerClass = '';
+      if (count === 3) {
+        containerClass = 'card-container';
+      } else if (count === 4) {
+        containerClass = 'card-container-4';
+      } else if (count === 6) {
+        containerClass = 'card-container-6';
+      } else if (count === 8) {
+        containerClass = 'card-container-8';
+      } else if (count === 9) {
+        containerClass = 'card-container-9';
+      }
+
+      cardContainer.className = containerClass;
+
+      // 카드 생성
+      for (let i = 0; i < count; i++) {
+        const card = drawCard();
+        const cardItem = document.createElement('div');
+        cardItem.classList.add('card-item');
+
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.innerHTML = `<img src="${card}" alt="Card">`;
+
+        const memoElement = document.createElement('input');
+        memoElement.classList.add('memo');
+        memoElement.setAttribute('placeholder', '자리 의미');
+
+        // 카드 클릭 시 메모칸 표시
+        cardElement.addEventListener('click', function() {
+          memoElement.classList.toggle('memo-visible');
+        });
+
+        cardItem.appendChild(cardElement);
+        cardItem.appendChild(memoElement);
+
+        cardContainer.appendChild(cardItem);
+      }
+    }
+
+    document.getElementById('draw-3-cards').addEventListener('click', function() {
+      usedCards = [];
+      drawCards(3);
+    });
+    document.getElementById('draw-4-cards').addEventListener('click', function() {
+      usedCards = [];
+      drawCards(4);
+    });
+    document.getElementById('draw-6-cards').addEventListener('click', function() {
+      usedCards = [];
+      drawCards(6);
+    });
+    document.getElementById('draw-8-cards').addEventListener('click', function() {
+      usedCards = [];
+      drawCards(8);
+    });
+    document.getElementById('draw-9-cards').addEventListener('click', function() {
+      usedCards = [];
+      drawCards(9);
+    });
+  </script>
+
+</body>
+</html>
